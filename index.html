@@ -401,6 +401,7 @@
   .reason-area label span {
     color: var(--muted);
     font-weight: 400;
+    font-size: 12px;
   }
 
   .reason-area textarea {
@@ -984,6 +985,11 @@
 
 <script>
 // ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyC-WEuRZ61x6gbMViGfgTBmmOdq072djvUbUmCy4itdnHiSqP_6MMRJK1y4-GBW36b/exec";
+
+// ═══════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════
 
@@ -1219,7 +1225,7 @@ let state = {
   pendingNext: null // 'next' | 'end'
 };
 
-// Simulated leaderboard (other players)
+// Fallback leaderboard if API fails
 const FAKE_PLAYERS = [
   { name: "Aria Chen", score: 290 },
   { name: "Marcus Liu", score: 265 },
@@ -1313,7 +1319,7 @@ function renderDecision(idx) {
       </div>
 
       <div class="reason-area">
-        <label>💬 你为什么这样选？<span>（请输入你的理由，至少 10 个字）</span></label>
+        <label>💬 你为什么这样选？<span>（选填）</span></label>
         <textarea id="reason-input" placeholder="例如：我认为算法推荐能够突破用户的社交圈限制，让好内容触达更多人，虽然短期会有争议，但长期价值更大……" oninput="checkReady()"></textarea>
       </div>
 
@@ -1339,9 +1345,8 @@ function selectOption(letter) {
 
 function checkReady() {
   const selected = document.getElementById('game-body')._selectedOption;
-  const reason = document.getElementById('reason-input')?.value.trim() || '';
   const btn = document.getElementById('confirm-btn');
-  if (btn) btn.disabled = !(selected && reason.length >= 10);
+  if (btn) btn.disabled = !selected;
 }
 
 function confirmChoice() {
@@ -1452,8 +1457,52 @@ function showFinal() {
   // Comparison table
   renderComparison();
 
-  // Ranking
-  renderRanking(total);
+  // Submit score then load ranking
+  submitScore(total);
+}
+
+async function submitScore(total) {
+  // Show loading state in ranking
+  document.getElementById('ranking-list').innerHTML = '<div style="color:var(--muted);text-align:center;padding:24px">⏳ 正在提交分数...</div>';
+
+  try {
+    const payload = {
+      action: "submit",
+      name: state.playerName,
+      momentum: state.momentum,
+      trust: state.trust,
+      total: total,
+      choices: state.choices.map(c => c.optionLetter)
+    };
+
+    // Use no-cors to avoid CORS issues with Google Apps Script
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    // Wait a moment then load scores
+    setTimeout(() => loadRanking(total), 1500);
+  } catch(e) {
+    // Fallback to fake leaderboard
+    renderRanking(total, null);
+  }
+}
+
+async function loadRanking(total) {
+  try {
+    const resp = await fetch(GOOGLE_SCRIPT_URL + "?action=scores&t=" + Date.now());
+    const data = await resp.json();
+    if (data.status === "ok" && data.scores && data.scores.length > 0) {
+      renderRanking(total, data.scores);
+    } else {
+      renderRanking(total, null);
+    }
+  } catch(e) {
+    renderRanking(total, null);
+  }
 }
 
 function renderVerdict(total) {
@@ -1510,20 +1559,45 @@ function renderComparison() {
   });
 }
 
-function renderRanking(total) {
-  // Insert player into fake leaderboard
-  const allPlayers = [
-    ...FAKE_PLAYERS,
-    { name: state.playerName + ' 👈', score: total, isYou: true }
-  ].sort((a, b) => b.score - a.score);
-
-  const maxScore = allPlayers[0].score;
+function renderRanking(total, liveScores) {
   const list = document.getElementById('ranking-list');
   list.innerHTML = '';
 
-  allPlayers.forEach((p, i) => {
-    const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
-    const rankEmoji = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+  let allPlayers;
+
+  if (liveScores && liveScores.length > 0) {
+    // Use live scores from Google Sheets
+    // Check if current player already in list
+    const meInList = liveScores.find(s => s.name === state.playerName && s.total === total);
+    allPlayers = liveScores.map(s => ({
+      name: s.name,
+      score: Number(s.total),
+      isYou: s.name === state.playerName && Number(s.total) === total
+    }));
+    // If not found, add manually
+    if (!meInList) {
+      allPlayers.push({ name: state.playerName, score: total, isYou: true });
+      allPlayers.sort((a, b) => b.score - a.score);
+    }
+  } else {
+    // Fallback: fake leaderboard
+    allPlayers = [
+      ...FAKE_PLAYERS,
+      { name: state.playerName, score: total, isYou: true }
+    ].sort((a, b) => b.score - a.score);
+  }
+
+  const maxScore = Math.max(...allPlayers.map(p => p.score), 1);
+
+  // Show top 10 + always show current player
+  const top10 = allPlayers.slice(0, 10);
+  const meIdx = allPlayers.findIndex(p => p.isYou);
+  if (meIdx >= 10) top10.push({ ...allPlayers[meIdx], rank: meIdx + 1 });
+
+  top10.forEach((p, i) => {
+    const rank = p.rank || i + 1;
+    const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+    const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}`;
     const barWidth = Math.round((p.score / maxScore) * 100);
 
     const card = document.createElement('div');
@@ -1541,6 +1615,12 @@ function renderRanking(total) {
     `;
     list.appendChild(card);
   });
+
+  const source = liveScores ? '🟢 实时排行榜' : '⚠️ 网络异常，显示模拟数据';
+  const note = document.createElement('div');
+  note.style.cssText = 'text-align:center;font-size:12px;color:var(--muted);margin-top:12px;';
+  note.textContent = source;
+  list.appendChild(note);
 }
 
 // ═══════════════════════════════════════
