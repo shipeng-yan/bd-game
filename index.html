@@ -1473,16 +1473,41 @@ function submitScore(total) {
     choices: state.choices.map(c => c.optionLetter)
   };
 
-  // Use no-cors POST (fire and forget — data goes in even without response)
-  fetch(GOOGLE_SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  }).catch(() => {});
+  // Submit via hidden form (bypasses CORS completely)
+  submitViaForm(payload);
 
   // Load ranking after delay (give POST time to write)
   setTimeout(() => loadRankingJSONP(total), 2500);
+}
+
+function submitViaForm(payload) {
+  // Create a hidden iframe to receive the form response (avoid page redirect)
+  let iframe = document.getElementById('submit-iframe');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = 'submit-iframe';
+    iframe.name = 'submit-iframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+  }
+
+  // Create a hidden form
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = GOOGLE_SCRIPT_URL;
+  form.target = 'submit-iframe';
+  form.style.display = 'none';
+
+  // Add data as hidden input (Apps Script reads via e.parameter)
+  const input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'data';
+  input.value = JSON.stringify(payload);
+  form.appendChild(input);
+
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(() => form.remove(), 3000);
 }
 
 function loadRankingJSONP(total) {
