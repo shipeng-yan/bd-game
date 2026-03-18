@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>科技创业者：你会怎么选？</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --border: #2a2a3a;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --gold: #f5c842;
+    --green: #4ade80;
+    --red: #f87171;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --momentum: #6c63ff;
+    --trust: #4ade80;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ── INTRO ── */
+  #screen-intro {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    background: radial-gradient(ellipse at 50% 0%, #1a1040 0%, var(--bg) 70%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #screen-intro::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+    top: -200px; left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .intro-tag {
+    display: inline-block;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.4);
+    color: var(--accent);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .intro-title {
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 30%, #a8a0ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .intro-sub {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  .score-preview {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .score-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .score-pill .icon { font-size: 20px; }
+  .score-pill .label { color: var(--muted); }
+  .score-pill .val { font-weight: 700; font-size: 18px; }
+
+  .name-input-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 420px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .name-input-area label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .name-input-area input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 16px;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+
+  .name-input-area input:focus { border-color: var(--accent); }
+  .name-input-area input::placeholder { color: var(--muted); }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 36px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .btn-primary:hover { background: #5a52e8; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,99,255,0.4); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* ── GAME ── */
+  #screen-game {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .game-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .game-title-small {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .scores-bar {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .score-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .score-item .s-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .score-item .s-val {
+    font-size: 18px;
+    font-weight: 800;
+    transition: all 0.4s;
+  }
+
+  .score-item.momentum .s-val { color: var(--momentum); }
+  .score-item.trust .s-val { color: var(--trust); }
+
+  .score-bar-track {
+    width: 80px;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  .score-bar-fill.momentum { background: var(--momentum); }
+  .score-bar-fill.trust { background: var(--trust); }
+
+  .progress-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .progress-dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  .dot.done { background: var(--accent); }
+  .dot.current { background: var(--gold); }
+
+  .game-body {
+    flex: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 48px 24px;
+  }
+
+  .decision-number {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .decision-title {
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 800;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .theory-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(108,99,255,0.1);
+    border: 1px solid rgba(108,99,255,0.25);
+    color: #a8a0ff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .context-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #c8c8e0;
+  }
+
+  .context-box .year-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .option-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .option-card:hover {
+    border-color: var(--accent);
+    background: var(--surface2);
+    transform: translateX(4px);
+  }
+
+  .option-card.selected {
+    border-color: var(--accent);
+    background: rgba(108,99,255,0.08);
+  }
+
+  .option-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--surface2);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--muted);
+    margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+
+  .option-card.selected .option-letter,
+  .option-card:hover .option-letter {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .option-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .option-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .reason-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .reason-area label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .reason-area label span {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .reason-area textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  .reason-area textarea:focus { border-color: var(--accent); }
+  .reason-area textarea::placeholder { color: var(--muted); }
+
+  .confirm-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 18px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .confirm-btn:hover:not(:disabled) { background: #5a52e8; transform: translateY(-1px); }
+  .confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 480px;
+    width: 100%;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s;
+  }
+
+  .modal-overlay.show .modal-box {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .modal-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .modal-choice {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .score-changes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .score-change-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 14px 18px;
+  }
+
+  .score-change-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .score-change-val {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .score-change-val.pos { color: var(--green); }
+  .score-change-val.neg { color: var(--red); }
+
+  .score-change-new {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 2px;
+  }
+
+  .modal-insight {
+    background: rgba(108,99,255,0.08);
+    border: 1px solid rgba(108,99,255,0.2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c0baf0;
+    margin-bottom: 24px;
+  }
+
+  .modal-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+
+  .modal-btn:hover { background: #5a52e8; }
+
+  /* ── GAME OVER ── */
+  #screen-gameover {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+    background: radial-gradient(ellipse at 50% 50%, #200a0a 0%, var(--bg) 70%);
+  }
+
+  .gameover-icon { font-size: 80px; margin-bottom: 24px; }
+  .gameover-title { font-size: 42px; font-weight: 800; color: var(--red); margin-bottom: 12px; }
+  .gameover-sub { font-size: 18px; color: var(--muted); margin-bottom: 40px; max-width: 480px; line-height: 1.7; }
+
+  /* ── FINAL ── */
+  #screen-final {
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .final-hero {
+    background: linear-gradient(135deg, #1a1040 0%, #0d1a30 100%);
+    padding: 80px 24px 60px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .reveal-tag {
+    display: inline-block;
+    background: rgba(245,200,66,0.15);
+    border: 1px solid rgba(245,200,66,0.4);
+    color: var(--gold);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .final-company {
+    font-size: clamp(40px, 8vw, 80px);
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .final-tagline {
+    font-size: 18px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  .final-score-box {
+    display: inline-flex;
+    gap: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .final-score-item { text-align: center; }
+  .final-score-item .fs-val { font-size: 40px; font-weight: 800; }
+  .final-score-item .fs-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .final-score-item.momentum .fs-val { color: var(--momentum); }
+  .final-score-item.trust .fs-val { color: var(--trust); }
+  .final-score-item.total .fs-val { color: var(--gold); }
+
+  .final-body {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    width: 100%;
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    margin-bottom: 48px;
+  }
+
+  .comparison-table th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0 16px 8px;
+  }
+
+  .comparison-table td {
+    padding: 16px;
+    background: var(--surface);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .comparison-table td:first-child { border-radius: 12px 0 0 12px; color: var(--muted); font-weight: 600; }
+  .comparison-table td:last-child { border-radius: 0 12px 12px 0; }
+  .comparison-table td:nth-child(2) { color: #a8a0ff; }
+  .comparison-table td:nth-child(3) { color: var(--gold); }
+
+  .match-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .match-badge.yes { background: rgba(74,222,128,0.15); color: var(--green); }
+  .match-badge.no { background: rgba(248,113,113,0.15); color: var(--red); }
+  .match-badge.partial { background: rgba(245,200,66,0.15); color: var(--gold); }
+
+  /* ── RANKING ── */
+  .ranking-section { margin-bottom: 60px; }
+
+  .rank-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .rank-card.highlight {
+    border-color: var(--gold);
+    background: rgba(245,200,66,0.05);
+  }
+
+  .rank-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--muted);
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .rank-num.top1 { color: var(--gold); }
+  .rank-num.top2 { color: #c0c0c0; }
+  .rank-num.top3 { color: #cd7f32; }
+
+  .rank-name { flex: 1; font-weight: 600; font-size: 15px; }
+  .rank-you { font-size: 11px; color: var(--gold); font-weight: 700; background: rgba(245,200,66,0.1); padding: 2px 8px; border-radius: 10px; }
+
+  .rank-score {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .rank-bar {
+    width: 80px;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .rank-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--trust));
+  }
+
+  .final-cta {
+    text-align: center;
+    padding: 40px 0 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .final-cta h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .final-cta p { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-up { animation: fadeUp 0.5s ease forwards; }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .score-change { animation: pulse 0.4s ease; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .game-header { padding: 12px 16px; }
+    .game-body { padding: 28px 16px; }
+    .modal-box { padding: 28px 20px; }
+    .final-hero { padding: 60px 16px 40px; }
+    .final-body { padding: 40px 16px; }
+    .comparison-table { font-size: 12px; }
+    .comparison-table td { padding: 12px 10px; }
+  }
+
+  .verdict-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 48px;
+  }
+
+  .verdict-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+  .verdict-box p { font-size: 15px; color: var(--muted); line-height: 1.8; }
+
+  .insight-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .chip.good { border-color: rgba(74,222,128,0.3); color: var(--green); background: rgba(74,222,128,0.05); }
+  .chip.bad { border-color: rgba(248,113,113,0.3); color: var(--red); background: rgba(248,113,113,0.05); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 1: INTRO
+═══════════════════════════════════════ -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-tag">🎮 互动决策游戏</div>
+  <h1 class="intro-title">你会怎么选？</h1>
+  <p class="intro-sub">
+    2012 年，你在北京创办了一家科技公司。<br>
+    接下来十年，每一个决策都可能改变历史。<br>
+    你，准备好了吗？
+  </p>
+
+  <div class="score-preview">
+    <div class="score-pill">
+      <span class="icon">⚡</span>
+      <span class="label">增长势能</span>
+      <span class="val" style="color:var(--momentum)">100</span>
+    </div>
+    <div class="score-pill">
+      <span class="icon">🤝</span>
+      <span class="label">社会信任</span>
+      <span class="val" style="color:var(--trust)">100</span>
+    </div>
+  </div>
+
+  <div class="name-input-area">
+    <label>你的名字（显示在排行榜上）</label>
+    <input type="text" id="player-name" placeholder="输入你的名字..." maxlength="20" />
+  </div>
+
+  <button class="btn-primary" onclick="startGame()">
+    开始游戏 →
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 2: GAME
+═══════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <div class="game-header">
+    <div class="game-title-small">科技创业者：你会怎么选？</div>
+
+    <div class="scores-bar">
+      <div class="score-item momentum">
+        <span class="s-label">⚡ 增长势能</span>
+        <div class="score-bar-track">
+          <div class="score-bar-fill momentum" id="bar-momentum" style="width:100%"></div>
+        </div>
+        <span class="s-val" id="score-momentum">100</span>
+      </div>
+      <div class="score-item trust">
+        <span class="s-label">🤝 社会信任</span>
+        <div class="score-bar-track">
+          <div class="score-bar-fill trust" id="bar-trust" style="width:100%"></div>
+        </div>
+        <span class="s-val" id="score-trust">100</span>
+      </div>
+    </div>
+
+    <div class="progress-area">
+      <div class="progress-dots" id="progress-dots"></div>
+      <span id="progress-text">1 / 6</span>
+    </div>
+  </div>
+
+  <div class="game-body" id="game-body">
+    <!-- Injected by JS -->
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 3: GAME OVER
+═══════════════════════════════════════ -->
+<div id="screen-gameover" class="screen">
+  <div class="gameover-icon">💀</div>
+  <h1 class="gameover-title">公司倒闭了</h1>
+  <p class="gameover-sub">
+    你的决策让公司陷入了无法挽回的困境。<br>
+    增长势能或社会信任归零——公司已无法运转。<br>
+    创业从来不是直线，重新来过？
+  </p>
+  <button class="btn-primary" onclick="resetGame()">
+    🔄 从头开始
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 4: FINAL
+═══════════════════════════════════════ -->
+<div id="screen-final" class="screen">
+  <div class="final-hero">
+    <div class="reveal-tag">🎉 真相揭晓</div>
+    <div class="final-company">字节跳动</div>
+    <p class="final-tagline">你刚刚经历的，正是全球最大科技公司之一的真实决策历程</p>
+
+    <div class="final-score-box">
+      <div class="final-score-item momentum">
+        <div class="fs-val" id="final-momentum">—</div>
+        <div class="fs-label">⚡ 增长势能</div>
+      </div>
+      <div class="final-score-item trust">
+        <div class="fs-val" id="final-trust">—</div>
+        <div class="fs-label">🤝 社会信任</div>
+      </div>
+      <div class="final-score-item total">
+        <div class="fs-val" id="final-total">—</div>
+        <div class="fs-label">🏆 综合得分</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="final-body">
+
+    <!-- VERDICT -->
+    <div class="verdict-box" id="verdict-box">
+      <h3 id="verdict-title">你的领导力风格</h3>
+      <p id="verdict-text"></p>
+      <div class="insight-chips" id="verdict-chips"></div>
+    </div>
+
+    <!-- COMPARISON TABLE -->
+    <div class="section-title">📊 你的选择 vs 字节跳动实际决策</div>
+    <table class="comparison-table" id="comparison-table">
+      <thead>
+        <tr>
+          <th>决策</th>
+          <th>你的选择</th>
+          <th>字节跳动实际</th>
+          <th>匹配度</th>
+        </tr>
+      </thead>
+      <tbody id="comparison-body">
+      </tbody>
+    </table>
+
+    <!-- RANKING -->
+    <div class="ranking-section">
+      <div class="section-title">🏅 本场排行榜</div>
+      <div id="ranking-list"></div>
+    </div>
+
+    <div class="final-cta">
+      <h3>你学到了什么？</h3>
+      <p>每一个决策背后，都是社会网络理论与企业领导力的真实博弈</p>
+      <button class="btn-primary" onclick="resetGame()">🔄 再玩一次</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MODAL
+═══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-icon" id="modal-icon">⚡</div>
+    <div class="modal-title" id="modal-title">决策结果</div>
+    <div class="modal-choice" id="modal-choice"></div>
+    <div class="score-changes" id="modal-scores"></div>
+    <div class="modal-insight" id="modal-insight"></div>
+    <button class="modal-btn" id="modal-btn" onclick="closeModal()">继续下一个决策 →</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+
+const DECISIONS = [
+  {
+    id: 1,
+    year: "2012",
+    number: "决策 01",
+    title: "产品定位——靠人脉还是靠算法？",
+    theory: "🔗 社会网络理论：强连接 vs 弱连接",
+    context: `你在北京创办了一家<strong>内容聚合平台</strong>——一个「智能新闻 App」。用户打开 App，就能看到各类新闻、文章、视频。现在你需要决定：<strong>平台用什么方式，把内容推送给用户？</strong>这个选择将直接决定你的用户规模和商业模式。`,
+    options: [
+      {
+        letter: "A",
+        title: "社交优先",
+        desc: "依托熟人关系链推荐内容——用户关注朋友、关注大V，内容通过强连接传播。就像微信朋友圈那样，你看到的内容，是你认识的人分享的。开发成本低，早期增长快，但天花板明显。",
+        momentum: +10, trust: +25,
+        insight: "强连接（Strong Ties）带来信任和稳定，但弱连接（Weak Ties）才是信息跨越圈子传播的关键——格兰诺维特的研究表明，真正的机会往往来自弱连接。选A意味着你在熟人圈子里打转。",
+        icon: "👥"
+      },
+      {
+        letter: "B",
+        title: "算法为王",
+        desc: "放弃社交图谱，全力投入机器学习个性化推荐——不管你认不认识作者，只推你感兴趣的内容。越用越懂你，但「操纵用户」的争议也随之而来。前期技术投入大，但一旦跑通，规模效应极强。",
+        momentum: +40, trust: -30,
+        insight: "算法推荐打破了传统社会网络的边界，让内容突破强连接限制，实现大规模弱连接传播。这是革命性的，但也引发了「信息茧房」和「用户被算法操控」的社会担忧。",
+        icon: "🤖"
+      },
+      {
+        letter: "C",
+        title: "两条腿走路",
+        desc: "社交关系链 + 算法推荐双管齐下，兼顾熟人信任感和个性化体验。资源分散，节奏较慢，但风险也被分摊。",
+        momentum: +15, trust: +10,
+        insight: "看似稳健，实则模糊。两条路各自的优势都被稀释，既没有社交产品的黏性，也没有算法产品的爆发力。在竞争激烈的市场中，「两边都做」往往意味着「两边都不够强」。",
+        icon: "⚖️"
+      }
+    ],
+    bytedance: "B",
+    bytedanceNote: "张一鸣全力押注算法推荐，今日头条成为中国第一个真正意义上的算法驱动内容平台，日活用户在两年内突破1亿。"
+  },
+  {
+    id: 2,
+    year: "2014",
+    number: "决策 02",
+    title: "组织扩张——集权还是扁平化？",
+    theory: "🏢 企业领导力：授权 vs 控制",
+    context: `你的 App 用户量爆炸式增长，公司从最初的 20 人迅速扩张到 <strong>500 人</strong>，产品、技术、运营团队同时膨胀。你面临一个经典的管理难题：<strong>到底该怎么管人？</strong>你的决定将塑造整个公司的文化基因，影响未来数年的执行效率和创新能力。`,
+    options: [
+      {
+        letter: "A",
+        title: "集权管理",
+        desc: "建立清晰的汇报层级，所有重大决策由 CEO 和核心高管拍板。信息从上往下传达，执行统一、方向一致。管理有序，但决策速度慢，基层员工自主性弱，容易滋生官僚文化。",
+        momentum: -15, trust: +20,
+        insight: "集权结构在网络理论中属于「星型网络」——所有节点都指向中心。信息传递高效，但中心节点一旦失灵，整个网络瘫痪。外界认为稳定，内部其实脆弱。",
+        icon: "🏛️"
+      },
+      {
+        letter: "B",
+        title: "扁平 OKR 文化",
+        desc: "取消繁琐层级，推行 OKR 管理法——每个团队自己定目标、自己追踪进度，CEO 只负责定方向、提供「上下文」而非直接命令。执行灵活、创新活跃，但对团队自驱力要求极高，且高压文化引发外界批评。",
+        momentum: +35, trust: -20,
+        insight: "扁平网络增加了节点之间的横向连接，信息流动更快，创新更容易出现。但字节跳动的OKR文化也带来了「内卷」批评——员工在没有层级保护的情况下，往往承受极大压力。",
+        icon: "🚀"
+      },
+      {
+        letter: "C",
+        title: "混合制",
+        desc: "高层保留战略决策权，但中层团队在执行层面有较大自主空间。看似两全其美，但若边界不清，容易造成推诿和内耗。",
+        momentum: +10, trust: +5,
+        insight: "混合制的挑战在于：权责边界不清时，网络中会出现大量「结构洞」——没有人真正负责的灰色地带。这些地方往往是效率最低、问题最多的区域。",
+        icon: "🔀"
+      }
+    ],
+    bytedance: "B",
+    bytedanceNote: "字节跳动推行彻底的OKR文化，张一鸣提出「Context, not Control」理念——给员工足够的信息和方向，但不直接命令。这让公司产品迭代速度远超同行，但也引发了外界对员工高压工作环境的讨论。"
+  },
+  {
+    id: 3,
+    year: "2018",
+    number: "决策 03",
+    title: "危机应对——监管风波来了",
+    theory: "📡 社会网络理论：舆论传播与信息级联",
+    context: `你的平台已经拥有数亿用户，影响力巨大。突然，政府监管机构公开点名批评你的平台传播「低俗、标题党」内容，App 被勒令<strong>暂停新用户注册</strong>，媒体铺天盖地的负面报道涌来。处理不好，公司可能就此终结。<strong>你作为 CEO，怎么应对？</strong>`,
+    options: [
+      {
+        letter: "A",
+        title: "主动认错，全面配合",
+        desc: "CEO 亲自公开发表道歉声明，承认平台内容管理失职，主动下架问题内容，增加数千名人工审核员，并与监管机构建立长期沟通机制。短期形象受损，但换取监管信任和长期运营空间。",
+        momentum: -20, trust: +40,
+        insight: "在舆论网络中，危机信息的「负向级联」一旦启动极难逆转。主动道歉相当于在网络中注入「反向信号」，打断负面传播链条。认错不是软弱——在信息传播理论中，它是最有效的危机管理工具之一。",
+        icon: "🙏"
+      },
+      {
+        letter: "B",
+        title: "低调处理，最小化调整",
+        desc: "避免公开表态，只在内部做最低限度的内容整改，通过私下沟通与监管机构周旋，尽量减少对业务的冲击。短期业务损失小，但监管关系依然紧张，风险未消除。",
+        momentum: +10, trust: -15,
+        insight: "沉默在舆论网络中并非中立——当负面信息持续传播时，缺席本身就是一种信号，往往被解读为「心虚」。低调处理短期保住了业务，但监管的不信任会以更大的代价在未来兑现。",
+        icon: "🤫"
+      },
+      {
+        letter: "C",
+        title: "强硬回应，诉诸公众舆论",
+        desc: "公开质疑监管标准，联合其他科技公司和媒体人发声，将这场危机定性为「行业性问题」而非单一平台责任，试图通过舆论压力为自己争取空间。风险极高，可能激化矛盾。",
+        momentum: +5, trust: -40,
+        insight: "在权威型监管体系中，试图用舆论对抗监管是极高风险的网络博弈——你在挑战的不只是一个节点，而是整个权力网络的核心。历史上鲜有科技公司用这种方式获胜。",
+        icon: "⚔️"
+      }
+    ],
+    bytedance: "A",
+    bytedanceNote: "2018年4月，张一鸣亲自发表长篇道歉声明，称今日头条「价值观出了问题」，随后关闭内涵段子App，大规模增加内容审核人员。这次危机后，字节跳动反而获得了监管的更多信任，为后续发展铺路。"
+  },
+  {
+    id: 4,
+    year: "2017",
+    number: "决策 04",
+    title: "国际化战略——并购还是自建？",
+    theory: "🌐 社会网络理论：结构洞与跨网络桥接",
+    context: `国内市场趋于饱和，你把目光投向海外。此时欧美市场上有一款名叫「Melody」的短视频 App 非常火爆，主要用户是年轻人，日活跃用户已超过 <strong>1 亿</strong>，但公司资金链紧张，有被收购的意愿。你手头有足够的资金，但团队没有海外运营经验。<strong>这是你走向全球的关键一步，你怎么选？</strong>`,
+    options: [
+      {
+        letter: "A",
+        title: "收购 Melody",
+        desc: "花重金直接买下 Melody，获得其现成的用户基础、本地团队和品牌认知度。速度最快，但整合风险高——文化差异、管理摩擦、品牌定位都可能成为隐患，且「中国资本收购」会引发政治质疑。",
+        momentum: +40, trust: -20,
+        insight: "收购是「填补结构洞」的经典策略——Melody已经在你尚未进入的网络（海外年轻用户）中占据关键位置，买下它等于直接获得了跨网络的桥接能力。但这也为日后的地缘政治风险埋下伏笔。",
+        icon: "💰"
+      },
+      {
+        letter: "B",
+        title: "从零自建海外产品",
+        desc: "组建专属国际团队，针对海外用户习惯重新设计产品，打造属于自己的全球品牌。节省收购成本，品牌更纯粹，但起步慢、竞争窗口期短，很可能错失先机。",
+        momentum: +10, trust: +20,
+        insight: "自建相当于从零开始在陌生网络中建立节点。优点是品牌干净、没有政治包袱；缺点是在已有强势玩家的市场中，后来者需要付出数倍代价才能达到同等的网络效应。",
+        icon: "🏗️"
+      },
+      {
+        letter: "C",
+        title: "先自建，同步谈判收购",
+        desc: "一边自建海外产品试水，一边与 Melody 保持谈判。灵活保留两手准备，但资源被分散，两条线都难以全力推进，可能两头落空。",
+        momentum: +15, trust: -10,
+        insight: "两线并行在资源充足时是合理选择，但在窗口期有限的市场中，分散资源往往导致两条线都不够强。网络效应的赢家通吃特性，不等待犹豫者。",
+        icon: "🔄"
+      }
+    ],
+    bytedance: "A",
+    bytedanceNote: "2017年，字节跳动以约10亿美元收购Musical.ly，并于2018年将其与自家产品TikTok合并，迅速成为全球最大的短视频平台。这是中国科技公司最成功的海外并购之一，但也直接引发了后来美国政府对TikTok的安全审查。"
+  },
+  {
+    id: 5,
+    year: "2020",
+    number: "决策 05",
+    title: "地缘政治压力——数据主权之战",
+    theory: "🌏 企业领导力：利益相关者管理",
+    context: `你的海外短视频平台已成为全球最大的社交媒体之一，月活用户突破 <strong>10 亿</strong>。然而，海外政府开始以「国家安全」为由施压，要求你证明用户数据不会被母公司或本国政府获取，否则将强制封禁。谈判持续数年，你投入了数十亿美元试图满足合规要求。<strong>公司的全球化未来，悬而未决。你怎么选？</strong>`,
+    options: [
+      {
+        letter: "A",
+        title: "全面本地化，主动合规",
+        desc: "斥巨资将海外用户数据迁移至当地服务器，聘请独立第三方机构审计数据安全，并在组织架构上将海外业务与母公司实质性切割。成本极高，但展示诚意，争取监管信任。",
+        momentum: -25, trust: +40,
+        insight: "这是典型的「利益相关者管理」策略——当监管机构、用户、政府同时成为你必须照顾的网络节点时，主动让步换取信任，往往比对抗更有长期价值。代价是短期的，收益是结构性的。",
+        icon: "🛡️"
+      },
+      {
+        letter: "B",
+        title: "法律对抗，寸步不让",
+        desc: "拒绝接受政府要求，以违反宪法言论自由为由提起诉讼，在法庭上正面交锋。有机会赢得法律胜利，但对抗期间业务充满不确定性，且可能引发更大政治反弹。",
+        momentum: +15, trust: -35,
+        insight: "法律对抗是高风险高收益的策略。在民主法治体系中，企业有可能通过法律途径保护权益；但政治压力往往不遵循法律逻辑，法庭的胜利未必能换来政治的解压。",
+        icon: "⚖️"
+      },
+      {
+        letter: "C",
+        title: "寻求出售海外业务",
+        desc: "主动与多家潜在买家谈判，考虑将海外业务出售或分拆，彻底切断与地缘政治风险的关联。一劳永逸解决政治风险，但意味着放弃最有价值的全球资产。",
+        momentum: -35, trust: +25,
+        insight: "出售是「退出网络」的极端选择——彻底放弃在某个网络中的节点地位。虽然消除了风险，但也放弃了未来重新进入的可能。对字节跳动而言，TikTok是其最有价值的全球资产，出售的代价几乎无法弥补。",
+        icon: "🏳️"
+      }
+    ],
+    bytedance: "A",
+    bytedanceNote: "字节跳动启动「德州计划」（Project Texas），投入超过15亿美元将美国用户数据迁移至Oracle服务器，并由Oracle负责安全审计。尽管如此，TikTok在美国的法律挑战仍持续至今，2024年美国国会通过强制出售法案，字节跳动提起法律诉讼。"
+  },
+  {
+    id: 6,
+    year: "2021",
+    number: "决策 06",
+    title: "领导力传承——创始人该何去何从？",
+    theory: "👑 企业领导力：领导力继承与企业身份",
+    context: `你已经带领公司走过近十年，从一个小小的新闻 App 成长为全球顶级科技巨头，员工超过 <strong>10 万人</strong>，业务横跨数十个国家。但外部政治压力、监管挑战、舆论漩涡从未停歇。你开始意识到：也许公司需要的，不再只是一个有远见的创始人。<strong>你会如何处理自己的领导力传承？</strong>`,
+    options: [
+      {
+        letter: "A",
+        title: "主动退位，全面交棒",
+        desc: "公开宣布卸任 CEO，将权力移交给你亲自培养的接班人，自己转为董事会角色，专注长期战略和新方向探索。展现成熟的领导力格局，但公司能否平稳过渡，取决于接班人的能力。",
+        momentum: -10, trust: +35,
+        insight: "在网络理论中，创始人是公司网络的「核心节点」。主动退位是一种有意识地重构网络拓扑的行为——将中心节点的权力分散，让网络更具韧性。这需要极大的格局，也是最难的领导力决策之一。",
+        icon: "🎓"
+      },
+      {
+        letter: "B",
+        title: "坚守岗位，亲自应对",
+        desc: "拒绝退出，认为此刻换帅风险太大，坚持由自己主导应对所有挑战。稳定军心，但个人压力极大，且可能让外界认为公司高度依赖单一领导人，加剧风险感知。",
+        momentum: +20, trust: -30,
+        insight: "「单点依赖」是网络中的高风险结构——当一个节点承载过多连接时，它的失效会引发整个网络的崩溃。坚守的创始人往往是公司最大的资产，也可能是最大的脆弱点。",
+        icon: "💪"
+      },
+      {
+        letter: "C",
+        title: "半退半留，双轨并行",
+        desc: "任命联席 CEO 或总裁分担日常管理，自己保留重大决策否决权，逐步淡出。过渡期最平滑，但权责不清容易造成内部混乱，「两个大脑」决策效率低。",
+        momentum: +5, trust: +5,
+        insight: "双核心结构在网络中会产生「权力真空」——两个节点都有否决权，却没有一个节点有完整的决策权。这在平稳期可以运作，但在危机时刻往往导致决策瘫痪。",
+        icon: "🔀"
+      }
+    ],
+    bytedance: "A",
+    bytedanceNote: "2021年5月，张一鸣在公开信中宣布卸任CEO，由联合创始人梁汝波接任。张一鸣表示自己「对社会科学、新科技、教育、不同文化不同地方的人更有兴趣」，希望「有更多时间思考、学习」。这被视为中国科技史上最优雅的创始人退出之一。"
+  }
+];
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+
+let state = {
+  playerName: "玩家",
+  momentum: 100,
+  trust: 100,
+  currentDecision: 0,
+  choices: [], // { decisionId, optionLetter, reason }
+  pendingNext: null // 'next' | 'end'
+};
+
+// Simulated leaderboard (other players)
+const FAKE_PLAYERS = [
+  { name: "Aria Chen", score: 290 },
+  { name: "Marcus Liu", score: 265 },
+  { name: "Sophie Zhang", score: 248 },
+  { name: "Kevin Wu", score: 230 },
+  { name: "Linda Ho", score: 198 },
+];
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function updateScoreDisplay() {
+  const m = state.momentum;
+  const t = state.trust;
+
+  document.getElementById('score-momentum').textContent = m;
+  document.getElementById('score-trust').textContent = t;
+
+  const mPct = Math.max(0, Math.min(100, m));
+  const tPct = Math.max(0, Math.min(100, t));
+
+  document.getElementById('bar-momentum').style.width = mPct + '%';
+  document.getElementById('bar-trust').style.width = tPct + '%';
+
+  // Color warnings
+  const mEl = document.getElementById('score-momentum');
+  const tEl = document.getElementById('score-trust');
+  mEl.style.color = m <= 30 ? '#f87171' : 'var(--momentum)';
+  tEl.style.color = t <= 30 ? '#f87171' : 'var(--trust)';
+}
+
+function updateProgressDots(current) {
+  const dots = document.getElementById('progress-dots');
+  dots.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < current ? ' done' : i === current ? ' current' : '');
+    dots.appendChild(d);
+  }
+  document.getElementById('progress-text').textContent = `${current + 1} / 6`;
+}
+
+// ═══════════════════════════════════════
+// GAME FLOW
+// ═══════════════════════════════════════
+
+function startGame() {
+  const nameInput = document.getElementById('player-name').value.trim();
+  state.playerName = nameInput || '匿名创业者';
+  state.momentum = 100;
+  state.trust = 100;
+  state.currentDecision = 0;
+  state.choices = [];
+
+  showScreen('screen-game');
+  updateScoreDisplay();
+  renderDecision(0);
+}
+
+function renderDecision(idx) {
+  const d = DECISIONS[idx];
+  updateProgressDots(idx);
+
+  const body = document.getElementById('game-body');
+  body.innerHTML = `
+    <div class="fade-up">
+      <div class="decision-number">${d.number}</div>
+      <h2 class="decision-title">${d.title}</h2>
+      <div class="theory-tag">${d.theory}</div>
+
+      <div class="context-box">
+        <div class="year-badge">📅 ${d.year} 年</div><br>
+        ${d.context}
+      </div>
+
+      <div class="options-grid" id="options-grid">
+        ${d.options.map((opt, i) => `
+          <div class="option-card" id="opt-${opt.letter}" onclick="selectOption('${opt.letter}')">
+            <div class="option-letter">${opt.letter}</div>
+            <div class="option-title">${opt.icon} ${opt.title}</div>
+            <div class="option-desc">${opt.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="reason-area">
+        <label>💬 你为什么这样选？<span>（请输入你的理由，至少 10 个字）</span></label>
+        <textarea id="reason-input" placeholder="例如：我认为算法推荐能够突破用户的社交圈限制，让好内容触达更多人，虽然短期会有争议，但长期价值更大……" oninput="checkReady()"></textarea>
+      </div>
+
+      <button class="confirm-btn" id="confirm-btn" onclick="confirmChoice()" disabled>
+        确认选择 →
+      </button>
+    </div>
+  `;
+
+  // Reset selection
+  body._selectedOption = null;
+}
+
+function selectOption(letter) {
+  // Remove all selected
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  // Select this
+  document.getElementById('opt-' + letter).classList.add('selected');
+  // Store
+  document.getElementById('game-body')._selectedOption = letter;
+  checkReady();
+}
+
+function checkReady() {
+  const selected = document.getElementById('game-body')._selectedOption;
+  const reason = document.getElementById('reason-input')?.value.trim() || '';
+  const btn = document.getElementById('confirm-btn');
+  if (btn) btn.disabled = !(selected && reason.length >= 10);
+}
+
+function confirmChoice() {
+  const idx = state.currentDecision;
+  const d = DECISIONS[idx];
+  const letter = document.getElementById('game-body')._selectedOption;
+  const reason = document.getElementById('reason-input').value.trim();
+  const opt = d.options.find(o => o.letter === letter);
+
+  // Store choice
+  state.choices.push({ decisionId: d.id, optionLetter: letter, reason, option: opt, decision: d });
+
+  // Apply scores
+  const prevM = state.momentum;
+  const prevT = state.trust;
+  state.momentum += opt.momentum;
+  state.trust += opt.trust;
+
+  // Show modal
+  showResultModal(opt, prevM, prevT, idx);
+}
+
+function showResultModal(opt, prevM, prevT, idx) {
+  const isLast = idx === DECISIONS.length - 1;
+  const dead = state.momentum <= 0 || state.trust <= 0;
+
+  document.getElementById('modal-icon').textContent = opt.icon;
+  document.getElementById('modal-title').textContent = `你选择了：${opt.title}`;
+  document.getElementById('modal-choice').textContent = ``;
+
+  // Score changes
+  const mChange = opt.momentum;
+  const tChange = opt.trust;
+  const mSign = mChange >= 0 ? '+' : '';
+  const tSign = tChange >= 0 ? '+' : '';
+
+  document.getElementById('modal-scores').innerHTML = `
+    <div class="score-change-row">
+      <div>
+        <div class="score-change-label">⚡ 增长势能</div>
+        <div class="score-change-new">当前：${state.momentum}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="score-change-val ${mChange >= 0 ? 'pos' : 'neg'}">${mSign}${mChange}</div>
+      </div>
+    </div>
+    <div class="score-change-row">
+      <div>
+        <div class="score-change-label">🤝 社会信任</div>
+        <div class="score-change-new">当前：${state.trust}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="score-change-val ${tChange >= 0 ? 'pos' : 'neg'}">${tSign}${tChange}</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('modal-insight').innerHTML = `<strong>📚 理论视角：</strong> ${opt.insight}`;
+
+  const btn = document.getElementById('modal-btn');
+  if (dead) {
+    btn.textContent = '查看结果...';
+    state.pendingNext = 'dead';
+  } else if (isLast) {
+    btn.textContent = '查看最终结果 🎉';
+    state.pendingNext = 'end';
+  } else {
+    btn.textContent = '继续下一个决策 →';
+    state.pendingNext = 'next';
+  }
+
+  // Show modal
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+
+  // Update scores
+  updateScoreDisplay();
+
+  if (state.pendingNext === 'dead') {
+    setTimeout(() => showScreen('screen-gameover'), 300);
+  } else if (state.pendingNext === 'end') {
+    setTimeout(() => showFinal(), 300);
+  } else {
+    // Next decision
+    state.currentDecision++;
+    setTimeout(() => renderDecision(state.currentDecision), 300);
+  }
+}
+
+// ═══════════════════════════════════════
+// FINAL SCREEN
+// ═══════════════════════════════════════
+
+function showFinal() {
+  showScreen('screen-final');
+
+  const total = state.momentum + state.trust;
+  document.getElementById('final-momentum').textContent = state.momentum;
+  document.getElementById('final-trust').textContent = state.trust;
+  document.getElementById('final-total').textContent = total;
+
+  // Verdict
+  renderVerdict(total);
+
+  // Comparison table
+  renderComparison();
+
+  // Ranking
+  renderRanking(total);
+}
+
+function renderVerdict(total) {
+  let title, text, chips;
+
+  const matchCount = state.choices.filter(c => c.optionLetter === c.decision.bytedance).length;
+
+  if (total >= 350) {
+    title = "🏆 战略大师";
+    text = `你的决策组合展现出极高的战略平衡感——你既追求增长，也懂得维护信任。在社会网络理论中，这种能力被称为「网络中心性的动态管理」：你不只是在追求连接数量，而是在优化连接质量。你与字节跳动的实际决策有 ${matchCount}/6 个吻合。`;
+    chips = ['<span class="chip good">增长与信任并重</span>', '<span class="chip good">战略前瞻性强</span>', `<span class="chip good">决策匹配度 ${matchCount}/6</span>`];
+  } else if (total >= 250) {
+    title = "📈 稳健经营者";
+    text = `你的决策展现出务实的平衡感，在关键时刻能够权衡利弊。你没有追求极致的增长，也没有忽视信任的重要性。这是一种在复杂利益相关者网络中生存的成熟策略。你与字节跳动的实际决策有 ${matchCount}/6 个吻合。`;
+    chips = ['<span class="chip good">务实稳健</span>', '<span class="chip">中等风险偏好</span>', `<span class="chip">决策匹配度 ${matchCount}/6</span>`];
+  } else if (total >= 150) {
+    title = "⚡ 激进增长者";
+    text = `你倾向于追求增长，往往愿意为此牺牲社会信任。这种策略在短期内可以带来爆炸性的用户增长，但也让你在监管风险和公众关系上付出了代价。真实的科技公司历史表明，纯粹的增长导向往往在第5-10年遭遇最大危机。你与字节跳动的实际决策有 ${matchCount}/6 个吻合。`;
+    chips = ['<span class="chip bad">社会信任偏低</span>', '<span class="chip good">增长势能强劲</span>', `<span class="chip">决策匹配度 ${matchCount}/6</span>`];
+  } else {
+    title = "🌱 守成保守者";
+    text = `你非常看重社会信任和合规性，往往会在增长机会面前选择更安全的路径。这种策略让公司更稳健，但可能错失关键的市场窗口。在网络理论中，过度保守的节点会逐渐失去网络中心性，最终被更激进的竞争者边缘化。你与字节跳动的实际决策有 ${matchCount}/6 个吻合。`;
+    chips = ['<span class="chip bad">增长动能不足</span>', '<span class="chip good">社会信任高</span>', `<span class="chip">决策匹配度 ${matchCount}/6</span>`];
+  }
+
+  document.getElementById('verdict-title').textContent = title;
+  document.getElementById('verdict-text').textContent = text.replace(/<[^>]*>/g, '');
+  document.getElementById('verdict-chips').innerHTML = chips.join('');
+}
+
+function renderComparison() {
+  const tbody = document.getElementById('comparison-body');
+  tbody.innerHTML = '';
+
+  state.choices.forEach(c => {
+    const match = c.optionLetter === c.decision.bytedance;
+    const partial = false; // simplified
+
+    const playerOpt = c.decision.options.find(o => o.letter === c.optionLetter);
+    const bdOpt = c.decision.options.find(o => o.letter === c.decision.bytedance);
+
+    const matchBadge = match
+      ? '<span class="match-badge yes">✓ 一致</span>'
+      : '<span class="match-badge no">✗ 不同</span>';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${c.decision.number}<br><small style="color:var(--muted);font-weight:400">${c.decision.title.split('——')[0]}</small></td>
+      <td>${c.optionLetter}. ${playerOpt.title}</td>
+      <td>${c.decision.bytedance}. ${bdOpt.title}<br><small style="color:var(--muted)">${c.decision.bytedanceNote}</small></td>
+      <td>${matchBadge}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderRanking(total) {
+  // Insert player into fake leaderboard
+  const allPlayers = [
+    ...FAKE_PLAYERS,
+    { name: state.playerName + ' 👈', score: total, isYou: true }
+  ].sort((a, b) => b.score - a.score);
+
+  const maxScore = allPlayers[0].score;
+  const list = document.getElementById('ranking-list');
+  list.innerHTML = '';
+
+  allPlayers.forEach((p, i) => {
+    const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+    const rankEmoji = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+    const barWidth = Math.round((p.score / maxScore) * 100);
+
+    const card = document.createElement('div');
+    card.className = 'rank-card' + (p.isYou ? ' highlight' : '');
+    card.innerHTML = `
+      <div class="rank-num ${rankClass}">${rankEmoji}</div>
+      <div class="rank-name">
+        ${p.name}
+        ${p.isYou ? '<span class="rank-you">YOU</span>' : ''}
+      </div>
+      <div class="rank-bar">
+        <div class="rank-bar-fill" style="width:${barWidth}%"></div>
+      </div>
+      <div class="rank-score">${p.score}</div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════
+
+function resetGame() {
+  state = {
+    playerName: state.playerName,
+    momentum: 100,
+    trust: 100,
+    currentDecision: 0,
+    choices: [],
+    pendingNext: null
+  };
+  document.getElementById('player-name').value = state.playerName === '匿名创业者' ? '' : state.playerName;
+  showScreen('screen-intro');
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+
+// Allow Enter key on name input
+document.getElementById('player-name').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') startGame();
+});
+</script>
+</body>
+</html>
