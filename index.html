@@ -1481,33 +1481,19 @@ function submitScore(total) {
 }
 
 function submitViaForm(payload) {
-  // Create a hidden iframe to receive the form response (avoid page redirect)
-  let iframe = document.getElementById('submit-iframe');
-  if (!iframe) {
-    iframe = document.createElement('iframe');
-    iframe.id = 'submit-iframe';
-    iframe.name = 'submit-iframe';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-  }
+  // Encode all fields as URL params and use GET request via Image beacon
+  // This bypasses CORS completely — browsers always allow cross-origin GET via img src
+  const params = new URLSearchParams({
+    action: 'submit',
+    name: payload.name,
+    momentum: payload.momentum,
+    trust: payload.trust,
+    total: payload.total,
+    choices: JSON.stringify(payload.choices)
+  });
 
-  // Create a hidden form
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = GOOGLE_SCRIPT_URL;
-  form.target = 'submit-iframe';
-  form.style.display = 'none';
-
-  // Add data as hidden input (Apps Script reads via e.parameter)
-  const input = document.createElement('input');
-  input.type = 'hidden';
-  input.name = 'data';
-  input.value = JSON.stringify(payload);
-  form.appendChild(input);
-
-  document.body.appendChild(form);
-  form.submit();
-  setTimeout(() => form.remove(), 3000);
+  const img = new Image();
+  img.src = GOOGLE_SCRIPT_URL + '?' + params.toString();
 }
 
 function loadRankingJSONP(total) {
