@@ -1461,48 +1461,52 @@ function showFinal() {
   submitScore(total);
 }
 
-async function submitScore(total) {
-  // Show loading state in ranking
+function submitScore(total) {
   document.getElementById('ranking-list').innerHTML = '<div style="color:var(--muted);text-align:center;padding:24px">⏳ 正在提交分数...</div>';
 
-  try {
-    const payload = {
-      action: "submit",
-      name: state.playerName,
-      momentum: state.momentum,
-      trust: state.trust,
-      total: total,
-      choices: state.choices.map(c => c.optionLetter)
-    };
+  const payload = {
+    action: "submit",
+    name: state.playerName,
+    momentum: state.momentum,
+    trust: state.trust,
+    total: total,
+    choices: state.choices.map(c => c.optionLetter)
+  };
 
-    // Use no-cors to avoid CORS issues with Google Apps Script
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+  // Use no-cors POST (fire and forget — data goes in even without response)
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
 
-    // Wait a moment then load scores
-    setTimeout(() => loadRanking(total), 1500);
-  } catch(e) {
-    // Fallback to fake leaderboard
-    renderRanking(total, null);
-  }
+  // Load ranking after delay (give POST time to write)
+  setTimeout(() => loadRankingJSONP(total), 2500);
 }
 
-async function loadRanking(total) {
-  try {
-    const resp = await fetch(GOOGLE_SCRIPT_URL + "?action=scores&t=" + Date.now());
-    const data = await resp.json();
-    if (data.status === "ok" && data.scores && data.scores.length > 0) {
+function loadRankingJSONP(total) {
+  // Remove old script tag if exists
+  const old = document.getElementById('jsonp-script');
+  if (old) old.remove();
+
+  // Set global callback
+  window._jsonpCallback = function(data) {
+    if (data && data.status === "ok" && data.scores && data.scores.length > 0) {
       renderRanking(total, data.scores);
     } else {
       renderRanking(total, null);
     }
-  } catch(e) {
-    renderRanking(total, null);
-  }
+    const s = document.getElementById('jsonp-script');
+    if (s) s.remove();
+  };
+
+  // Create script tag for JSONP
+  const script = document.createElement('script');
+  script.id = 'jsonp-script';
+  script.src = GOOGLE_SCRIPT_URL + '?callback=_jsonpCallback&t=' + Date.now();
+  script.onerror = () => renderRanking(total, null);
+  document.head.appendChild(script);
 }
 
 function renderVerdict(total) {
